@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+   <!-- 引入数据库配置文件-->
+   <properties resource="database.properties"></properties>
+
+
+   <settings>
+      <!-- 日志-->
+      <setting name="logImpl" value="LOG4J"/>
+
+      <!--
+           映射级别：autoMappingBehavior
+           禁止匹配：NONE
+           自动匹配所有属性：PARTIAL   内部嵌套除外
+           自动匹配所有 ：FULL
+       -->
+      <setting name="autoMappingBehavior" value="FULL"/>
+   </settings>
+
+   <!-- 起别名-->
+   <typeAliases>
+      <package name="cn.kgc.bean"/>
+   </typeAliases>
+
+   <!--配置环境-->
+   <environments default="development">
+      <environment id="development">
+         <transactionManager type="JDBC"></transactionManager>
+         <dataSource type="POOLED">
+            <property name="driver" value="${driver}"/>
+            <property name="url" value="${url}"/>
+            <property name="username" value="${username}"/>
+            <property name="password" value="${password}"/>
+         </dataSource>
+      </environment>
+      <environment id="test">
+         <transactionManager type="JDBC"></transactionManager>
+         <dataSource type="POOLED">
+            <property name="driver" value="${driver}"/>
+            <property name="url" value="${url}"/>
+            <property name="username" value="${username}"/>
+            <property name="password" value="${password}"/>
+         </dataSource>
+      </environment>
+   </environments>
+
+   <!--指定mapper映射文件所在的位置-->
+   <mappers>
+      <mapper resource="cn/kgc/mapper/UserMapper.xml"></mapper>
+   </mappers>
+    
+
+</configuration>

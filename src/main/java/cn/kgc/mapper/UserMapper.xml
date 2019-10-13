@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.kgc.mapper.UserMapper">
+
+  <resultMap id="userRoleList" type="User">
+    <association property="role" javaType="Role">
+      <id property="id" column="id"></id>
+    </association>
+  </resultMap>
+
+
+  <resultMap id="wjxList" type="User">
+    <id property="id" column="id"></id>
+    <result property="userRoleName" column="roleName"></result>
+  </resultMap>
+
+  <resultMap id="addressList" type="User">
+    <id property="id" column="id"></id>
+    <collection property="addresses" ofType="Address">
+      <id property="id" column="id"></id>
+    </collection>
+  </resultMap>
+
+  <select id="getByUserName" resultType="User" parameterType="String">
+    select * from smbms_user where userName like concat('%',#{userName},'%')
+  </select>
+
+  <select id="getByUserNameandByuserRole" resultType="User" parameterType="User">
+    select * from smbms_user where userName like concat('%',#{userName},'%') and userRole=#{userRole}
+  </select>
+
+  <select id="getByUserNameByMap" resultType="User" parameterType="map">
+     select * from smbms_user where userName like concat('%',#{userName},'%') and userRole=#{userRole}
+  </select>
+
+  <select id="getByUserNameByUserRoleMap" resultMap="wjxList" parameterType="map">
+SELECT * FROM smbms_user u,smbms_role r WHERE userName LIKE  concat('%',#{userName},'%') AND userRole=#{userRole}
+AND u.userRole=r.id
+  </select>
+
+  <insert id="addUser" parameterType="User">
+      insert into
+          smbms_user(userCode,userName,userPassword,gender,birthday,phone,address,userRole,createdBy,creationDate)
+        values(#{userCode},#{userName},#{userPassword},#{gender},#{birthday},#{phone},#{address},#{userRole},#{createdBy},#{creationDate});
+  </insert>
+
+  <update id="updateUser" parameterType="User">
+    update smbms_user set  userCode=#{userCode},userName=#{userName} where id=#{id}
+
+  </update>
+
+  <delete id="delete">
+    delete from smbms_user where id=#{id}
+  </delete>
+
+  <update id="updatepwd">
+    update smbms_user set userPassword=#{userPassword} where id=#{id}
+  </update>
+
+  <select id="getByUserRole" parameterType="int" resultMap="userRoleList">
+    select * from smbms_user u,smbms_role r where u.userRole=r.id
+    and u.userRole=#{userRole}
+  </select>
+
+  <select id="getByUserIdandAddress" parameterType="int" resultMap="addressList">
+    select a.*,u.* from smbms_user u,smbms_address a where u.id=a.userId
+    and u.id=#{id}
+  </select>
+
+  <select id="getUserRoleanduserName" resultType="User">
+    select * from smbms_user
+    <where>
+    <if test="userRole !=null">
+      userRole=#{userRole}
+    </if>
+
+    <if test="userName !=null and userName!=''">
+      and userName like concat('%',#{userName},'%')
+    </if>
+    </where>
+  </select>
+
+  <update id="updatesettrim" parameterType="User">
+    update smbms_user
+    <trim prefix="set" suffix="where id=#{id}" suffixOverrides=",">
+      <if test="userCode !=null and userCode!=''">userCode=#{userCode}</if>
+      <if test="userName != null">userName=#{userName},</if>
+      <if test="userPassword != null">userPassword=#{userPassword},</if>
+      <if test="gender != null">gender=#{gender},</if>
+      <if test="birthday != null">birthday=#{birthday},</if>
+      <if test="phone != null">phone=#{phone},</if>
+      <if test="address != null">address=#{address},</if>
+      <if test="userRole != null">userRole=#{userRole},</if>
+      <if test="modifyBy != null">modifyBy=#{modifyBy},</if>
+      <if test="modifyDate != null">modifyDate=#{modifyDate}</if>
+    </trim>
+  </update>
+
+
+  <select id="get_foreach_array" resultType="User">
+    select * from smbms_user where userRole in
+    <foreach collection="array" item="userRole" open="(" separator="," close=")">
+      #{userRole}
+    </foreach>
+  </select>
+
+  <select id="get_foreach_list" resultType="User">
+    select * from smbms_user where userRole in
+    <foreach collection="list" item="user" open="(" separator="," close=")">
+      #{user}
+    </foreach>
+  </select>
+
+  <select id="get_foreach_map" resultType="User">
+    select * from smbms_user
+    <where>
+      <if test="gender !=null and gender !=''">gender=#{gender}</if>
+        and userRole in 
+      <foreach collection="userRoles" item="userRole" open="(" separator="," close=")">
+        #{userRole}
+      </foreach>
+    </where>
+  </select>
+
+
+  <select id="get_foreach_choose" resultType="User">
+    select * from smbms_user
+    <where>
+      <choose>
+        <when test="userCode !=null and userCode !=''">
+          userCode like concat('%',#{userCode},'%')
+        </when>
+        <when test="userName !=null and userName !=''">
+          userName like concat('%',#{userName},'%')
+        </when>
+        <otherwise>
+            userRole=#{userRole}
+        </otherwise>
+      </choose>
+    </where>
+  </select>
+
+  <select id="getBypages" resultType="User">
+    select * from smbms_user
+  </select>
+
+
+
+
+</mapper>
